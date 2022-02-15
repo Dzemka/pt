@@ -1,94 +1,63 @@
 #include "../push_swap.h"
 
-int ft_sort_3(t_list **list, t_list **res, int select)
+void    ft_sort_3_a(t_list **list)
 {
     int a;
     int b;
     int c;
 
-    a = ((t_elem *)(*list)->content)->pos_order;
-    b = ((t_elem *)(*list)->next->content)->pos_order;
-    c = ((t_elem *)(*list)->next->next->content)->pos_order;
+    a = *(int *)(*list)->content;
+    b = *(int *)(*list)->next->content;
+    c = *(int *)(*list)->next->next->content;
 
     if (c > b && b > a)
-        return (1);
+        return;
     if ((a > b && b > c) || (b > c && c > a))
     {
-        if (select == 1)
-            sa(list, res);
-        else
-            sb(list, res);
+        sa(list);
+        ft_sort_3_a(list);
     }
-    a = ((t_elem *)(*list)->content)->pos_order;
-    b = ((t_elem *)(*list)->next->content)->pos_order;
-    c = ((t_elem *)(*list)->next->next->content)->pos_order;
     if (c > a && a > b)
-    {
-        if(select == 1)
-        {
-            sa(list, res);
-        }
-        else
-        {
-            sb(list, res);
-        }
-    }
+            sa(list);
     if (a > c && c > b)
-    {
-        if (select == 1)
-            ra(list, res);
-        else
-            rb(list, res);
-    }
+            ra(list);
     if (b > a && a > c)
-    {
-        if (select == 1)
-            rra(list, res);
-        else
-            rrb(list, res);
-    }
-    return (1);
+            rra(list);
 }
 
-int ft_push_b(t_list **a, t_list **b, t_list **res, int max, int mid)
+void    ft_push_b(t_list **a, t_list **b, int min, int med, int max)
 {
     int temp;
 
-    temp = max;
+    temp = ft_lstsize(*a);
     while (temp)
     {
-        if(A_POS_ORDER == max || A_POS_ORDER == mid || A_POS_ORDER == 1)
-        {
-            if(!ra(a, res))
-                return (0);
-        }
+        if(A_VAL == max || A_VAL == med || A_VAL == min)
+            ra(a);
         else
-        {
-            if(!pb(b, a, res))
-                return (0);
-        }
+            pb(b, a);
         temp--;
     }
-    return (1);
 }
 
-int ft_count_rotate_a(t_list **a, int pos, int mid)
+int ft_count_rotate_a(t_list **a, int val, int med)
 {
     int     count_rotate;
     t_list  *elem;
     int     last_pos;
 
-    last_pos = ((t_elem *) ft_lstlast(*a)->content)->pos_order;
     count_rotate = 1;
     elem = *a;
-    if(pos < ((t_elem *)(elem->content))->pos_order && pos > last_pos)
+    last_pos = *(int *) ft_lstlast(*a);
+    if(val < ELEM_VAL && val > last_pos)
     {
-        if (last_pos >= mid || A_POS_ORDER <= mid)
-            return (0);
+//        if (last_pos >= med || A_VAL <= med)
+        return (0);
     }
+    (void)med;
     while (elem->next)
     {
-        if (pos > ((t_elem *)(elem->content))->pos_order && pos < ((t_elem *)(elem->next->content))->pos_order)
+        if (val > ELEM_VAL && val < *(int *)elem->next->content)
             break;
         count_rotate++;
         elem = elem->next;
@@ -104,6 +73,10 @@ void    ft_init_moves(t_moves *moves)
     moves->rra = 0;
     moves->rrb = 0;
     moves->rrr = 0;
+    moves->ra_rrb = 0;
+    moves->rb_rra = 0;
+    moves->ra_rb_rr = 0;
+    moves->rra_rrb_rrr = 0;
 }
 
 int ft_define_min_moves(t_moves *moves)
@@ -122,8 +95,7 @@ int ft_define_min_moves(t_moves *moves)
         temp_rb--;
         moves->rr++;
     }
-    moves->ra_rr = moves->rr + temp_ra + temp_rb;
-    moves->rb_rr = moves->ra_rr;
+    moves->ra_rb_rr = moves->rr + temp_ra + temp_rb;
     temp_ra = moves->rra;
     temp_rb = moves->rrb;
     while (temp_ra && temp_rb)
@@ -132,39 +104,38 @@ int ft_define_min_moves(t_moves *moves)
         temp_rb--;
         moves->rrr++;
     }
-    moves->rra_rrr = moves->rrr + temp_ra + temp_rb;
-    moves->rrb_rrr = moves->rra_rrr;
+    moves->rra_rrb_rrr = moves->rrr + temp_ra + temp_rb;
     min = moves->ra_rrb;
     if (moves->rb_rra < min)
         min = moves->rb_rra;
-    if(moves->ra_rr < min)
-        min = moves->ra_rr;
-    if(moves->rra_rrr < min)
-        min = moves->rra_rrr;
+    if(moves->ra_rb_rr < min)
+        min = moves->ra_rb_rr;
+    if(moves->rra_rrb_rrr < min)
+        min = moves->rra_rrb_rrr;
     return (min);
 }
 
-int ft_count_move(t_list **a, t_list **b, t_list *elem, int max, int mid, t_moves *moves)
+int ft_count_move(t_list **a, t_list **b, t_list *elem, t_moves *moves, int med)
 {
     int count;
-    int max_a;
+    int size_b;
+    int size_a;
 
     ft_init_moves(moves);
-    max = ft_lstsize(*b);
-    max_a = ft_lstsize(*a);
-    moves->rb = max - ft_lstsize(elem);
-    moves->rrb = max - moves->rb;
-    if (max == 1)
-        moves->rrb = 0;
-//    printf("MAX:%d, SIZE:%d, moves->rb:%d, moves->rrb:%d\n", max, ft_lstsize(elem), moves->rb, moves->rrb);
-    count = ft_count_rotate_a(a, ((t_elem *)elem->content)->pos_order, mid);
+    size_b = ft_lstsize(*b);
+    size_a = ft_lstsize(*a);
+    moves->rb = size_b - ft_lstsize(elem);
+    moves->rrb = size_b - moves->rb;
+    if (size_b == 1)
+        moves->rrb = moves->rb + 1;
+    count = ft_count_rotate_a(a, ELEM_VAL, med);
     moves->ra = count;
-    moves->rra = max_a - count;
+    moves->rra = size_a - count;
     count = ft_define_min_moves(moves);
     return (count);
 }
 
-t_list *ft_select_el(t_list **a, t_list **b, int max, int mid, t_moves *moves)
+t_list *ft_select_el(t_list **a, t_list **b, t_moves *moves, int med)
 {
     t_list *elem;
     int count_move;
@@ -172,12 +143,12 @@ t_list *ft_select_el(t_list **a, t_list **b, int max, int mid, t_moves *moves)
     t_list *min_elem;
 
     elem = *b;
-    min_count = ft_count_move(a, b, elem, max, mid, moves);
+    min_count = ft_count_move(a, b, elem, moves, med);
     min_elem = elem;
     elem = elem->next;
     while (elem)
     {
-        count_move = ft_count_move(a, b, elem, max, mid, moves);
+        count_move = ft_count_move(a, b, elem, moves, med);
         if (count_move < min_count)
         {
             min_count = count_move;
@@ -188,60 +159,56 @@ t_list *ft_select_el(t_list **a, t_list **b, int max, int mid, t_moves *moves)
     return (min_elem);
 }
 
-int ft_push_a(t_list **a, t_list **b, t_list **res, int mid)
+int ft_push_a(t_list **a, t_list **b, int med)
 {
     t_list *elem;
-    int max;
     t_moves *moves;
     int count;
 
+    if (!*b)
+        return (1);
     moves = malloc(sizeof(t_moves));
     if(!moves)
         return (0);
-    if (!*b)
-        return (1);
-    max = ft_lstsize(*b);
-    elem = ft_select_el(a, b, max, mid, moves);
-//    ft_translate(a, b);
-    count = ft_count_move(a, b, elem, max, mid, moves);
-//    printf("CNT_RA:%d, CNT_RB:%d, CNT_RR:%d, CNT_RRR:%d\n", moves->ra, moves->rb, moves->rr, moves->rrr);
-    if (moves->ra_rr == count)
+    elem = ft_select_el(a, b, moves, med);
+    count = ft_count_move(a, b, elem, moves, med);
+    if (moves->ra_rb_rr == count)
     {
         while (moves->rr)
         {
-            rr(a, b, res);
+            rr(a, b);
             moves->ra--;
             moves->rb--;
             moves->rr--;
         }
         while (moves->ra)
         {
-            ra(a, res);
+            ra(a);
             moves->ra--;
         }
         while (moves->rb)
         {
-            rb(b, res);
+            rb(b);
             moves->rb--;
         }
     }
-    else if (moves->rra_rrr == count)
+    else if (moves->rra_rrb_rrr == count)
     {
         while (moves->rrr)
         {
             moves->rra--;
             moves->rrb--;
             moves->rrr--;
-            rrr(a, b, res);
+            rrr(a, b);
         }
         while (moves->rra)
         {
-            rra(a, res);
+            rra(a);
             moves->rra--;
         }
         while (moves->rrb)
         {
-            rrb(b, res);
+            rrb(b);
             moves->rrb--;
         }
     }
@@ -249,12 +216,12 @@ int ft_push_a(t_list **a, t_list **b, t_list **res, int mid)
     {
         while (moves->ra)
         {
-            ra(a, res);
+            ra(a);
             moves->ra--;
         }
         while (moves->rrb)
         {
-            rrb(b, res);
+            rrb(b);
             moves->rrb--;
         }
     }
@@ -262,53 +229,107 @@ int ft_push_a(t_list **a, t_list **b, t_list **res, int mid)
     {
         while (moves->rra)
         {
-            rra(a, res);
+            rra(a);
             moves->rra--;
         }
         while (moves->rb)
         {
-            rb(b, res);
+            rb(b);
             moves->rb--;
         }
     }
-    if(!pa(a, b, res))
-        return (0);
-//    ft_translate(a , b);
-    ft_push_a(a, b, res, mid);
+    pa(a, b);
+    ft_push_a(a, b, med);
     return (1);
 }
 
-int ft_sorting(t_list **a, t_list **b, t_list **res)
+void    ft_define_border(t_list *a, int *min, int *med, int *max)
 {
-    int max;
-    int mid;
+    int size;
+    t_list *elem;
+    t_list *temp;
+    int temp_size;
 
-    max = ft_lstsize(*a);
-    mid = max / 2;
-    if(!ft_push_b(a, b, res, max, mid))
-       return (0);
-    ft_sort_3(a, res, 1);
-//    ft_translate(a, b);
-    ft_push_a(a, b, res, mid);
+    elem = a;
+    size = ft_lstsize(a);
+    while (elem)
+    {
+        temp_size = size;
+        temp = a;
+        while (temp)
+        {
+            if (*(int *)elem->content > *(int *)temp->content)
+                temp_size--;
+            temp = temp->next;
+        }
+        if (temp_size == size / 2)
+            *med = *(int *)elem->content;
+        if (temp_size == size)
+            *min = *(int *)elem->content;
+        if (temp_size == 1)
+            *max = *(int *)elem->content;
+        elem = elem->next;
+    }
+}
+
+void    ft_final_sort(t_list **a, int min)
+{
+    t_list *elem;
+    int size_a;
+    int count_rotate;
+
+    elem = *a;
+    count_rotate = 0;
+    size_a = ft_lstsize(*a);
+    while (ELEM_VAL != min)
+    {
+        count_rotate++;
+        elem = elem->next;
+    }
+    if (size_a / 2 > count_rotate)
+    {
+        while (count_rotate)
+        {
+            ra(a);
+            count_rotate--;
+        }
+    }
+    else
+    {
+        count_rotate = size_a - count_rotate;
+        while (count_rotate)
+        {
+            rra(a);
+            count_rotate--;
+        }
+    }
+}
+
+int ft_sorting(t_list **a, t_list **b)
+{
+    int min;
+    int med;
+    int max;
+
+    min = 0;
+    med = 0;
+    max = 0;
+    ft_define_border(*a, &min, &med, &max);
+    ft_push_b(a, b, min, med, max);
+    ft_sort_3_a(a);
+    if (!ft_push_a(a, b, med))
+        return (0);
+    ft_final_sort(a, min);
     return (1);
 }
 
 int ft_push_swap(t_list **a, t_list **b)
 {
-    t_list  *res;
-
-    res = NULL;
-    ft_define_order(*a);
-
     if (ft_check_sort(*a))
         return (1);
     else if (ft_lstsize(*a) == 3)
-        ft_sort_3(a, &res, 1);
-    else if (!ft_sorting(a, b, &res))
-        return (0);
-    while (A_POS_ORDER != 1)
-        rra(a, &res);
-    ft_print_cmnds(res);
-    ft_lstclear(&res, free);
+        ft_sort_3_a(a);
+    else if (!ft_sorting(a, b))
+            return (0);
     return (1);
 }

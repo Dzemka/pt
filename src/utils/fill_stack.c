@@ -2,29 +2,18 @@
 
 static int  ft_check_double(t_list *list, int n)
 {
-    t_list  *temp;
+    t_list  *elem;
 
-    temp = list;
-    while (temp)
+    elem = list;
+    while (elem)
     {
-        if (((t_elem *)temp->content)->val == n)
+        if (*(int *)elem->content == n)
         {
             return (1);
         }
-        temp = temp->next;
+        elem = elem->next;
     }
     return (0);
-}
-
-static  t_elem *ft_new_elem(int n)
-{
-    t_elem *elem;
-
-    elem = (t_elem *) malloc(sizeof (t_elem));
-    if(!elem)
-        return (NULL);
-    elem->val = n;
-    return (elem);
 }
 
 static int ft_check_errors(char *str)
@@ -46,11 +35,11 @@ static int ft_check_errors(char *str)
 static int  ft_get_val(char *str, t_list **list)
 {
     char **values;
-    t_elem *temp_elem;
-    t_list *temp_list;
+    t_list *elem;
     int i;
+    int *val;
 
-    temp_list = *list;
+    elem = *list;
     i = 0;
     if(ft_check_errors(str))
         return (0);
@@ -58,13 +47,16 @@ static int  ft_get_val(char *str, t_list **list)
     i = 0;
     while(values[i])
     {
-        temp_elem = ft_new_elem(ft_atoi(values[i]));
-        temp_list = ft_lstnew(temp_elem);
-        if (!temp_list || !temp_elem || ft_check_double(*list, temp_elem->val))
+        val = (int *)malloc(sizeof (int *));
+        *val = ft_atoi(values[i]);
+        free(values[i]);
+        elem = ft_lstnew(val);
+        if (!elem || ft_check_double(*list, *val))
             return (0);
-        ft_lstadd_back(list, temp_list);
+        ft_lstadd_back(list, elem);
         i++;
     }
+    free(values);
     return (1);
 }
 int ft_fill_stack(int argc, char **argv, t_list **a)

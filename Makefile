@@ -8,11 +8,11 @@ UTILS_DIR = ./src/utils
 
 SRC_MAIN = $(SRC_DIR)/push_swap.c $(SRC_DIR)/select_swap.c
 
-SRC_UTILS = $(UTILS_DIR)/fill_stack.c $(UTILS_DIR)/algorithm_utils.c $(UTILS_DIR)/print_commands.c
+SRC_UTILS = $(UTILS_DIR)/fill_stack.c $(UTILS_DIR)/algorithm_utils.c
 
 SRC_COMMANDS = $(CMD_DIR)/swap.c $(CMD_DIR)/push.c $(CMD_DIR)/rotate.c $(CMD_DIR)/reverse_rotate.c
 
-SRC = $(SRC_MAIN) $(SRC_UTILS) $(SRC_COMMANDS)
+SRC = $(SRC_MAIN) $(SRC_UTILS)  $(SRC_COMMANDS)
 
 OBJ = $(SRC:%.c=%.o)
 

@@ -1,7 +1,7 @@
 #include "../../push_swap.h"
 
 
-static void    swap(t_list **list)
+void    swap(t_list **list)
 {
     t_list *elem;
 
@@ -12,45 +12,21 @@ static void    swap(t_list **list)
     (*list) = elem;
 }
 
-int sa(t_list **a, t_list **res)
+void    sa(t_list **a)
 {
-    t_list *elem;
-    char *str;
-
     swap(a);
-    str = ft_strdup("sa\n");
-    elem = ft_lstnew(str);
-    if (!elem || !str)
-        return (0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("sa\n", 1);
 }
 
-int sb(t_list **b, t_list **res)
+void    sb(t_list **b)
 {
-    t_list *elem;
-    char    *str;
-
     swap(b);
-    str = ft_strdup("sb\n");
-    elem = ft_lstnew(str);
-    if (!elem || !str)
-        return (0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("sb\n", 1);
 }
 
-int ss(t_list **a, t_list **b, t_list **res)
+void    ss(t_list **a, t_list **b)
 {
-    t_list *elem;
-    char    *str;
-
     swap(a);
     swap(b);
-    str = ft_strdup("ss\n");
-    elem = ft_lstnew(str);
-    if (!elem || !str)
-        return (0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("ss\n", 1);
 }

@@ -10,30 +10,14 @@ void    push(t_list **src, t_list **dst)
     *src = elem;
 }
 
-int pa(t_list **a, t_list **b, t_list **res)
+void    pa(t_list **a, t_list **b)
 {
-    t_list *elem;
-    char *str;
-
     push(b, a);
-    str = ft_strdup("pa\n");
-    elem = ft_lstnew(str);
-    if (!elem || !str)
-        return(0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("pa\n", 1);
 }
 
-int pb(t_list **b, t_list **a, t_list **res)
+void    pb(t_list **b, t_list **a)
 {
-    t_list *elem;
-    char *str;
-
     push(a, b);
-    str = ft_strdup("pb\n");
-    elem = ft_lstnew(str);
-    if(!elem|| !str)
-        return (0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("pb\n", 1);
 }

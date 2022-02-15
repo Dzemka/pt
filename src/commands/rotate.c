@@ -9,44 +9,22 @@ static void rotate(t_list **list)
     *list = (*list)->next;
     elem->next = NULL;
 }
-int ra(t_list **a, t_list **res)
+void    ra(t_list **a)
 {
-    t_list *elem;
-    char *str;
-
     rotate(a);
-    str = ft_strdup("ra\n");
-    elem = ft_lstnew(str);
-    if (!elem || !str)
-        return (0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("ra\n", 1);
 }
 
-int rb(t_list **b, t_list **res)
+void    rb(t_list **b)
 {
-    t_list *elem;
-    char    *str;
-
     rotate(b);
-    str = ft_strdup("rb\n");
-    elem = ft_lstnew(str);
-    if (!elem || !str)
-        return (0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("rb\n", 1);
 }
 
-int rr(t_list **a, t_list **b, t_list **res) {
-    t_list *elem;
-    char *str;
+void    rr(t_list **a, t_list **b)
+{
 
     rotate(a);
     rotate(b);
-    str = ft_strdup("rr\n");
-    elem = ft_lstnew(str);
-    if (!elem || !str)
-        return (0);
-    ft_lstadd_back(res, elem);
-    return (1);
+    ft_putstr_fd("rr\n", 1);
 }
